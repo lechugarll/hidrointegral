@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import CaudalChart from "./CaudalChart.jsx";
+import AjusteLlave from "./AjusteLlave.jsx";
 import { ESCENARIOS, ESCENARIO_PROPIO, porId } from "../escenarios.js";
 import { fmt, instanteEn, interp } from "../util/numeros.js";
 
@@ -36,6 +37,7 @@ function Miniatura({ f, a, b }) {
 
 export default function LaboratorioVolumen({
   escId, onElegir, params, capacidad, onCapacidad, datos, cargando, error, onAplicarPropio,
+  llave, onLlave,
 }) {
   const esc = porId(escId);
   const ac = datos?.acumulada;
@@ -162,6 +164,8 @@ export default function LaboratorioVolumen({
           q(t) = <code>{params.q}</code> <span>L/min, de t = {a} a t = {b} min</span>
         </p>
       </div>
+
+      {escId === "llave" && <AjusteLlave valores={llave} onChange={onLlave} />}
 
       {escId === "propio" && (
         <form className="propio" onSubmit={aplicarPropio} noValidate>

@@ -18,7 +18,9 @@ HidroIntegral hace visible esa idea: mueves el tiempo y ves a la vez cómo cambi
 
 ![Tanque 3D y área bajo la curva del caudal](docs/capturas/laboratorio-tanque.png)
 
-- Elegir entre **cinco situaciones reales** (una llave que se abre, un caudal constante, una bomba con ciclos, la lluvia sobre un techo y un depósito que se vacía) y ver **por qué** el caudal tiene esa forma.
+- Entender primero **qué es el caudal** (litros por minuto, y cómo se relaciona con `Q = V/t` y `Q = A·v`).
+- Elegir entre **seis situaciones reales** (una llave que se abre, un caudal constante, un caudal que se acelera, una bomba con ciclos, la lluvia sobre un techo y un depósito que se vacía) y ver **por qué** el caudal tiene esa forma.
+- Ajustar la llave con **deslizadores** (caudal inicial, aumento por minuto y duración) y ver la fórmula `q(t) = k·t + q₀` con cada parte rotulada y su integral resuelta.
 - Escribir **tu propia función** del caudal, por ejemplo `12+8*sin(t)`.
 - Reproducir la animación o **arrastrar sobre la gráfica** para viajar en el tiempo.
 - Cambiar la capacidad del tanque y ver si **se desborda** y cuándo se llena.

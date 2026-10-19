@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { calcularVolumen } from "../api.js";
+import QueEsElCaudal from "../components/QueEsElCaudal.jsx";
 import LaboratorioVolumen from "../components/LaboratorioVolumen.jsx";
 import UsosDelArea from "../components/UsosDelArea.jsx";
 import MetodosNumericos from "../components/MetodosNumericos.jsx";
@@ -7,6 +8,8 @@ import { ESCENARIOS, porId } from "../escenarios.js";
 import useSEO from "../hooks/useSEO.js";
 
 const INICIAL = ESCENARIOS[0];
+// Valores de partida de los deslizadores de la «llave que se abre»: q(t) = 2t + 3, de 0 a 4 min.
+const LLAVE_INICIAL = { q0: 3, k: 2, T: 4 };
 
 export default function Volumen() {
   useSEO(
@@ -17,6 +20,7 @@ export default function Volumen() {
   const [escId, setEscId] = useState(INICIAL.id);
   const [params, setParams] = useState({ q: INICIAL.q, a: INICIAL.a, b: INICIAL.b });
   const [capacidad, setCapacidad] = useState(INICIAL.capacidad);
+  const [llave, setLlave] = useState(LLAVE_INICIAL);
   const [datos, setDatos] = useState(null);
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
@@ -39,10 +43,22 @@ export default function Volumen() {
     };
   }, [params]);
 
+  // Los deslizadores de la llave arman q(t) = k·t + q₀. Se espera 250 ms tras el último
+  // movimiento para no lanzar una petición por cada paso, y no se repite si no cambió nada.
+  useEffect(() => {
+    if (escId !== "llave") return undefined;
+    const espera = setTimeout(() => {
+      const q = `${llave.k}*t+${llave.q0}`;
+      setParams((p) => (p.q === q && p.a === 0 && p.b === llave.T ? p : { q, a: 0, b: llave.T }));
+    }, 250);
+    return () => clearTimeout(espera);
+  }, [llave, escId]);
+
   function elegir(id) {
     setEscId(id);
     const e = porId(id);
     setCapacidad(e.capacidad);
+    if (id === "llave") setLlave(LLAVE_INICIAL);
     setParams({ q: e.q, a: e.a, b: e.b });
   }
 
@@ -62,6 +78,8 @@ export default function Volumen() {
         </p>
       </header>
 
+      <QueEsElCaudal />
+
       <LaboratorioVolumen
         escId={escId}
         onElegir={elegir}
@@ -72,6 +90,8 @@ export default function Volumen() {
         cargando={cargando}
         error={error}
         onAplicarPropio={aplicarPropio}
+        llave={llave}
+        onLlave={setLlave}
       />
 
       <UsosDelArea datos={datos} capacidad={capacidad} />

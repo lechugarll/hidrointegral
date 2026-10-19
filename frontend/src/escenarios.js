@@ -30,6 +30,18 @@ export const ESCENARIOS = [
     f: () => 10,
   },
   {
+    id: "acelerado",
+    nombre: "Caudal que se acelera",
+    q: "t^2+2",
+    a: 0,
+    b: 4,
+    capacidad: 40,
+    forma: "una curva que sube cada vez más rápido",
+    porque:
+      "Imagina un grifo que se abre cada vez más rápido, o una bomba que arranca y va ganando potencia: el caudal no solo sube, sube cada vez más deprisa. Es un modelo simplificado, pero sirve para ver una integral con la regla de la potencia: V = t³/3 + 2t.",
+    f: (t) => t * t + 2,
+  },
+  {
     id: "bomba",
     nombre: "Bomba con ciclos",
     q: "10+8*sin(2*t)",

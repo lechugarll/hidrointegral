@@ -365,6 +365,139 @@ input[type="range"] {
   color: var(--suave);
 }
 
+/* «¿Qué es el caudal?» */
+.caudal-explica {
+  margin: 0.5rem 0 2.5rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1.4rem 1.6rem;
+}
+
+.caudal-explica h2 {
+  font-size: 1.35rem;
+  margin: 0 0 0.8rem;
+}
+
+.caudal-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 1.2rem 2.5rem;
+  align-items: start;
+}
+
+.caudal-texto p,
+.caudal-formulas li > span:last-child {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.caudal-texto p {
+  margin: 0 0 0.7rem;
+}
+
+.caudal-formulas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.caudal-formulas li {
+  display: grid;
+  grid-template-columns: 6.2rem minmax(0, 1fr);
+  gap: 0.8rem;
+  align-items: baseline;
+}
+
+.caudal-eq {
+  font-family: Cambria, "Cambria Math", var(--serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--acento-oscuro);
+  background: #fff;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  padding: 0.25rem 0.6rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Deslizadores de la «llave que se abre» */
+.ajuste {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1rem 1.2rem 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.ajuste h3 {
+  font-size: 1.05rem;
+  margin: 0 0 0.4rem;
+}
+
+.ajuste-controles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.6rem;
+}
+
+.ajuste-controles .campo-rango {
+  flex: 1 1 13rem;
+}
+
+.formula-anotada {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.4rem 1rem;
+  margin: 0.8rem 0 0.4rem;
+}
+
+.fa-parte {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.fa-simbolo {
+  font-family: Cambria, "Cambria Math", var(--serif);
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.fa-nota {
+  font-size: 0.85rem;
+  color: var(--suave);
+  border-top: 2px solid var(--borde-control);
+  padding-top: 0.2rem;
+  margin-top: 0.2rem;
+  max-width: 11rem;
+}
+
+.fa-mas .fa-simbolo {
+  color: var(--suave);
+}
+
+.ajuste-integral {
+  font-family: Cambria, "Cambria Math", var(--serif);
+  font-size: 1.1rem;
+  margin: 0.6rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .caudal-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* Selector de situaciones, con la miniatura de cada curva */
 .selector {
   display: flex;

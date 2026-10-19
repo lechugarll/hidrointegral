@@ -52,6 +52,25 @@ def test_curva_acumulada_con_funcion_gaussiana_es_rapida_y_correcta():
     assert c["V"][0] == 0
 
 
+def test_caudal_que_aumenta_de_forma_lineal_con_otros_parametros():
+    # q(t) = 4t + 1 de 0 a 7 min (caudal inicial 1 L/min, aumento 4 L/min²):
+    # V = 4·7²/2 + 1·7 = 98 + 7 = 105 L.
+    assert v.volumen_exacto(v.parse_q("4*t+1"), 0, 7) == pytest.approx(105)
+
+
+@pytest.mark.parametrize("q0,k,T", [(3, 2, 4), (1, 4, 7), (0.5, 0, 10), (20, 10, 1)])
+def test_formula_lineal_q0_mas_kt(q0, k, T):
+    # Con q(t) = k·t + q0, el volumen exacto es k·T²/2 + q0·T (es lo que muestran los deslizadores).
+    assert v.volumen_exacto(v.parse_q(f"{k}*t+{q0}"), 0, T) == pytest.approx(k * T**2 / 2 + q0 * T)
+
+
+def test_caudal_acelerado_t2_mas_2():
+    # q(t) = t² + 2 de 0 a 4 min: V = t³/3 + 2t = 64/3 + 8 ≈ 29.33 L (regla de la potencia).
+    q = v.parse_q("t^2+2")
+    assert v.volumen_exacto(q, 0, 4) == pytest.approx(64 / 3 + 8)
+    assert v.caudal_promedio(q, 0, 4) == pytest.approx((64 / 3 + 8) / 4)
+
+
 def test_tiempo_llenado():
     assert v.tiempo_llenado(Q, 28) == pytest.approx(4, abs=1e-6)
 
