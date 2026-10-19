@@ -1,0 +1,1106 @@
+/* ==========================================================================
+   HidroIntegral — explicación visual del cálculo integral aplicado al agua.
+   Dirección: texto editorial (serif) que acompaña a escenas interactivas;
+   instrumentos oscuros solo donde hay 3D; el resto, papel blanco y tinta.
+   ========================================================================== */
+
+:root {
+  /* Superficies y tinta */
+  --fondo: #ffffff;
+  --superficie: #f4f7fb; /* paneles de control y franjas de lectura */
+  --borde: #dbe3ee;
+  --borde-control: #8a9bb0; /* borde de campos: 3:1 contra blanco */
+  --texto: #0f1b2d; /* 16:1 sobre blanco */
+  --suave: #445468; /* 7.7:1 sobre blanco */
+  /* Marca (contraste verificado WCAG AA: blanco sobre --acento = 5.9:1) */
+  --acento: #0369a1;
+  --acento-oscuro: #075985;
+  --acento-claro: #0ea5e9; /* decorativo: nunca para texto ni botones */
+  --area: #38bdf8;
+  --rect: #f59e0b;
+  /* Instrumento (escenas 3D) */
+  --instrumento: #0b1326;
+  --instrumento-texto: #e0f2fe;
+  /* Estado */
+  --exito: #166534;
+  --error: #991b1b;
+  --aviso: #7a4a06;
+  /* Tipografía: serif del sistema para leer; sans del sistema para controlar */
+  --serif: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+  --radio: 12px;
+  --ancho-lectura: 68ch;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 106.25%; /* 17 px: legible en pantallas proyectadas */
+}
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  background: var(--fondo);
+  color: var(--texto);
+  line-height: 1.55;
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
+  line-height: 1.2;
+}
+
+/* Accesibilidad -------------------------------------------------------- */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.saltar {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: var(--acento-oscuro);
+  color: #fff;
+  padding: 0.6rem 1rem;
+  border-radius: 0 0 8px 0;
+  z-index: 100;
+}
+
+.saltar:focus {
+  left: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+}
+
+.escena-marco :focus-visible,
+.cookie-banner :focus-visible {
+  outline-color: #7dd3fc;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Barra superior ---------------------------------------------------------- */
+.barra {
+  border-bottom: 1px solid var(--borde);
+  background: var(--fondo);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.barra-interior {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  min-height: 3.6rem;
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--instrumento);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.marca-icono {
+  width: 2rem;
+  height: 2rem;
+}
+
+.barra-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.barra-nav a {
+  color: var(--suave);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 1.05rem 0 0.9rem;
+  border-bottom: 3px solid transparent;
+}
+
+.barra-nav a:hover {
+  color: var(--texto);
+}
+
+.barra-nav a.active {
+  color: var(--acento-oscuro);
+  border-bottom-color: var(--acento);
+}
+
+.contenedor {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+}
+
+/* Introducción de cada página ------------------------------------------ */
+.intro {
+  padding: 2.5rem 0 1.5rem;
+}
+
+.intro h1 {
+  font-size: 2.4rem;
+  margin: 0 0 0.9rem;
+  letter-spacing: -0.01em;
+}
+
+.lede {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  line-height: 1.5;
+  color: var(--suave);
+  max-width: 62ch;
+  margin: 0;
+}
+
+.lede strong {
+  color: var(--texto);
+}
+
+/* Texto de lectura (serif) ---------------------------------------------- */
+.porque p,
+.usos p,
+.usos dd,
+.metodos p,
+.perfil p,
+.leyenda-grafica,
+.nota-promedio,
+.escena-col figcaption,
+.documento p,
+.documento li {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.usos-intro,
+.metodos > p,
+.perfil > p,
+.porque p {
+  max-width: var(--ancho-lectura);
+}
+
+/* Botones ---------------------------------------------------------------- */
+button {
+  font-family: var(--sans);
+}
+
+button.principal,
+.boton-enlace {
+  background: var(--acento);
+  color: #fff;
+  border: 1.5px solid var(--acento);
+  border-radius: 10px;
+  padding: 0.65rem 1.3rem;
+  min-height: 2.75rem;
+  font-size: 1rem;
+  font-weight: 650;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+button.principal:hover,
+.boton-enlace:hover {
+  background: var(--acento-oscuro);
+}
+
+button.principal:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button.secundario {
+  background: #fff;
+  color: var(--texto);
+  border: 1.5px solid var(--borde-control);
+  border-radius: 10px;
+  padding: 0.6rem 1.1rem;
+  min-height: 2.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.secundario:hover {
+  background: var(--superficie);
+}
+
+/* Campos de formulario ---------------------------------------------------- */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.campo label,
+.campo .rotulo {
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: var(--texto);
+}
+
+.campo input:not([type="range"]),
+.campo select {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--borde-control);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #fff;
+  color: var(--texto);
+}
+
+.campo input[aria-invalid="true"] {
+  border-color: var(--error);
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--acento);
+  min-height: 2.75rem;
+  margin: 0;
+}
+
+.campo-error {
+  color: var(--error);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.campo-rango {
+  flex: 1 1 14rem;
+}
+
+/* Avisos ----------------------------------------------------------------- */
+.error,
+.aviso,
+.aviso-ok,
+.aviso-rebose {
+  border: 1px solid;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  margin: 1rem 0;
+  font-size: 0.98rem;
+}
+
+.error,
+.aviso-rebose {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: var(--error);
+}
+
+.aviso {
+  background: #fff8eb;
+  border-color: #f4d58d;
+  color: var(--aviso);
+}
+
+.aviso.aviso-rebose {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  color: var(--error);
+}
+
+.aviso-ok {
+  background: #effaf3;
+  border-color: #a7dbb8;
+  color: var(--exito);
+}
+
+/* ==========================================================================
+   Laboratorio del volumen
+   ========================================================================== */
+.lab {
+  margin-top: 1rem;
+}
+
+.lab-titulo {
+  font-size: 1.5rem;
+  margin: 0 0 1rem;
+}
+
+.lab-carga {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--suave);
+}
+
+/* Selector de situaciones, con la miniatura de cada curva */
+.selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.opcion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 0.6rem 0.8rem 0.65rem;
+  background: #fff;
+  border: 1.5px solid var(--borde-control);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--texto);
+  min-width: 9.5rem;
+  flex: 1 1 9.5rem;
+  max-width: 13rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.opcion:hover {
+  background: var(--superficie);
+}
+
+.opcion.activa {
+  border-color: var(--acento);
+  background: #eaf4fb;
+  box-shadow: 0 0 0 1.5px var(--acento);
+}
+
+.opcion-nombre {
+  font-size: 0.92rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.mini {
+  width: 100%;
+  height: 2rem;
+  display: block;
+}
+
+.mini-linea {
+  fill: none;
+  stroke: var(--acento-oscuro);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.mini-area {
+  fill: var(--area);
+  fill-opacity: 0.28;
+}
+
+.mini-texto {
+  fill: var(--suave);
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
+.porque {
+  margin: 1.2rem 0 1rem;
+}
+
+.porque p {
+  margin: 0 0 0.5rem;
+}
+
+.porque-formula {
+  font-family: var(--sans) !important;
+  font-size: 0.95rem !important;
+  color: var(--suave);
+}
+
+.porque-formula code {
+  font-family: var(--mono);
+  font-size: 1rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  padding: 0.1rem 0.45rem;
+  color: var(--texto);
+}
+
+/* Formulario de «Mi propia función» */
+.propio {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.9rem;
+  align-items: end;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.campo-ancho {
+  grid-column: 1 / -1;
+}
+
+.campo-error-ancho {
+  grid-column: 1 / -1;
+}
+
+/* Figura principal: tanque 3D + gráfica */
+.lab-cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 1.25rem 1.75rem;
+  margin-top: 0.5rem;
+  align-items: start;
+}
+
+.lab-cuerpo > .mando,
+.lab-cuerpo > .lecturas,
+.lab-cuerpo > .aviso,
+.lab-cuerpo > .nota-promedio {
+  grid-column: 1 / -1;
+}
+
+.escena-col {
+  margin: 0;
+}
+
+.escena-col figcaption {
+  font-size: 0.95rem;
+  color: var(--suave);
+  margin-top: 0.6rem;
+}
+
+.escena-marco {
+  position: relative;
+  height: 27rem;
+  border-radius: var(--radio);
+  overflow: hidden;
+  background: radial-gradient(ellipse at 30% 15%, #16315a 0%, var(--instrumento) 72%);
+}
+
+.tanque3d,
+.tanque3d-lienzo {
+  width: 100%;
+  height: 100%;
+}
+
+.tanque3d-carga {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--instrumento-texto);
+}
+
+.tanque3d-giro {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  display: flex;
+  gap: 0.35rem;
+}
+
+button.icono {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(224, 242, 254, 0.45);
+  background: rgba(11, 19, 38, 0.6);
+  color: var(--instrumento-texto);
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+button.icono:hover {
+  background: rgba(224, 242, 254, 0.18);
+}
+
+.escena-lectura {
+  position: absolute;
+  left: 1rem;
+  bottom: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  color: var(--instrumento-texto);
+  pointer-events: none;
+}
+
+.escena-pct {
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.escena-lit {
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.2rem;
+}
+
+/* Gráfica del caudal */
+.grafica-col {
+  min-width: 0;
+}
+
+.cg {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.cg-rejilla { stroke: #e3eaf3; stroke-width: 1; }
+.cg-eje { stroke: #8a9bb0; stroke-width: 1.5; }
+.cg-marca { fill: var(--suave); font-size: 13px; font-family: var(--sans); }
+.cg-titulo-eje { fill: var(--texto); font-size: 13px; font-weight: 600; font-family: var(--sans); }
+.cg-curva { fill: none; stroke: var(--acento-oscuro); stroke-width: 3; stroke-linejoin: round; }
+.cg-area { fill: var(--area); fill-opacity: 0.38; }
+.cg-cursor { stroke: var(--texto); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.cg-punto { fill: #fff; stroke: var(--acento-oscuro); stroke-width: 3.5; }
+.cg-etiqueta { fill: var(--texto); font-size: 14px; font-weight: 650; font-family: var(--sans); }
+.cg-promedio { fill: var(--rect); fill-opacity: 0.14; stroke: #92400e; stroke-width: 2; stroke-dasharray: 7 5; }
+.cg-etiqueta-promedio { fill: #7c2d12; }
+
+.leyenda-grafica {
+  font-size: 0.98rem;
+  color: var(--suave);
+  margin: 0.4rem 0 0;
+}
+
+.rotulo-area {
+  background: rgba(56, 189, 248, 0.32);
+  padding: 0 0.3rem;
+  border-radius: 4px;
+  color: var(--texto);
+}
+
+/* Barra de control de la animación */
+.mando {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.25rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 0.9rem 1.1rem;
+}
+
+.mando .principal {
+  min-width: 7.5rem;
+  align-self: flex-end;
+}
+
+.mando-tiempo {
+  flex: 1 1 14rem;
+  align-self: flex-end;
+}
+
+.campo-corto {
+  flex: 0 1 9rem;
+}
+
+.interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  min-height: 2.75rem;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.interruptor input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: var(--acento);
+}
+
+/* Lecturas en vivo: una sola franja de instrumento, sin tarjetas */
+.lecturas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--borde);
+  border-bottom: 1px solid var(--borde);
+}
+
+.lectura {
+  padding: 0.85rem 1.2rem;
+  border-left: 1px solid var(--borde);
+}
+
+.lectura:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+
+.lectura dt {
+  font-size: 0.88rem;
+  color: var(--suave);
+  font-weight: 600;
+}
+
+.lectura dd {
+  margin: 0.15rem 0 0;
+  font-size: 1.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.lectura dd small {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--suave);
+}
+
+.lectura-principal dd {
+  font-size: 2.4rem;
+  color: var(--acento-oscuro);
+}
+
+.regimen {
+  display: inline-block;
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85rem !important;
+  font-weight: 650 !important;
+  vertical-align: middle;
+}
+
+.regimen.turbulento { background: #ffedd5; color: #9a3412 !important; }
+.regimen.laminar { background: #dbeafe; color: #1e3a8a !important; }
+.regimen.transicion { background: #f3e8ff; color: #581c87 !important; }
+
+.nota-promedio {
+  background: #fff8eb;
+  border: 1px solid #f4d58d;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  margin: 0;
+  max-width: none;
+}
+
+/* ==========================================================================
+   Secciones de texto: usos y métodos
+   ========================================================================== */
+.usos,
+.metodos,
+.perfil {
+  margin-top: 4rem;
+}
+
+.usos h2,
+.metodos h2,
+.perfil h2 {
+  font-size: 1.7rem;
+  margin: 0 0 0.8rem;
+}
+
+.metodos h3 {
+  font-size: 1.2rem;
+  margin: 2.2rem 0 0.5rem;
+}
+
+.usos-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  gap: 0 3rem;
+  margin: 1.5rem 0 0;
+}
+
+.usos-lista > div {
+  border-top: 1px solid var(--borde);
+  padding: 1rem 0 1.4rem;
+}
+
+.usos-lista dt {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.usos-lista dd {
+  margin: 0;
+}
+
+.ecuacion {
+  font-family: Cambria, "Cambria Math", var(--serif) !important;
+  font-size: 1.25rem !important;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.controles-metodo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  align-items: flex-end;
+  margin: 1rem 0;
+}
+
+.aproximacion {
+  margin: 0;
+  font-family: var(--sans) !important;
+  font-size: 1rem !important;
+}
+
+.aproximacion span {
+  color: var(--suave);
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.tabla-metodos,
+.tabla-doc {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  margin-top: 0.8rem;
+}
+
+.tabla-metodos caption {
+  text-align: left;
+  color: var(--suave);
+  padding-bottom: 0.5rem;
+}
+
+.tabla-metodos th,
+.tabla-metodos td,
+.tabla-doc th,
+.tabla-doc td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--borde);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla-metodos th,
+.tabla-metodos td {
+  text-align: right;
+}
+
+.tabla-metodos th:first-child,
+.tabla-metodos td:first-child {
+  text-align: left;
+}
+
+.tabla-metodos small {
+  display: block;
+  color: var(--suave);
+}
+
+.tabla-doc th,
+.tabla-doc td {
+  text-align: left;
+  vertical-align: top;
+}
+
+.tabla-metodos thead th,
+.tabla-doc thead th {
+  background: var(--superficie);
+  font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   Página de tubería
+   ========================================================================== */
+.controles-tuberia {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: flex-end;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 0.9rem 1.1rem;
+  margin: 0.5rem 0 1.25rem;
+}
+
+.controles-tuberia .campo:first-child {
+  flex: 0 1 14rem;
+}
+
+.escena3d-fig {
+  margin: 0 0 1.25rem;
+}
+
+.escena3d {
+  height: 27rem;
+  border-radius: var(--radio);
+  overflow: hidden;
+  background: radial-gradient(ellipse at 30% 15%, #16315a 0%, var(--instrumento) 72%);
+}
+
+.escena3d-carga {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--instrumento-texto);
+}
+
+.escena3d-barra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.escena3d-leyenda {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-family: var(--serif);
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--suave);
+  max-width: 78ch;
+}
+
+.escena3d-gradiente {
+  flex: 0 0 14px;
+  align-self: stretch;
+  min-height: 44px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, #e0f2fe, #3b82f6);
+  border: 1px solid var(--borde);
+}
+
+.perfil {
+  margin-top: 3rem;
+}
+
+/* ==========================================================================
+   Páginas de documento (privacidad, términos, cookies) y 404
+   ========================================================================== */
+.panel {
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1.75rem;
+  margin: 2rem 0;
+  background: #fff;
+}
+
+.documento h2 {
+  font-size: 1.7rem;
+  margin-top: 0;
+}
+
+.documento h3 {
+  font-size: 1.1rem;
+  margin-top: 1.6rem;
+  color: var(--acento-oscuro);
+}
+
+.documento p,
+.documento li {
+  max-width: var(--ancho-lectura);
+}
+
+.documento ul {
+  padding-left: 1.25rem;
+}
+
+.documento li {
+  margin-bottom: 0.5rem;
+}
+
+.documento-fecha {
+  font-family: var(--sans) !important;
+  color: var(--suave);
+  font-size: 0.88rem !important;
+  margin-top: -0.3rem;
+}
+
+.documento a {
+  color: var(--acento-oscuro);
+}
+
+.error404 {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.error404-codigo {
+  font-size: 5rem;
+  font-weight: 800;
+  color: var(--acento);
+  line-height: 1;
+}
+
+.error404 p {
+  max-width: 34rem;
+  margin: 0.8rem auto;
+  color: var(--suave);
+}
+
+/* ==========================================================================
+   Pie de página y aviso de consentimiento
+   ========================================================================== */
+.pie {
+  text-align: center;
+  color: var(--suave);
+  font-size: 0.9rem;
+  padding: 2rem 1.5rem 2.5rem;
+  border-top: 1px solid var(--borde);
+  margin-top: 3rem;
+}
+
+.pie-formula {
+  font-family: Cambria, "Cambria Math", var(--serif);
+  color: var(--acento-oscuro);
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.pie-enlaces {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.pie-enlaces a {
+  color: var(--acento-oscuro);
+  text-decoration: none;
+}
+
+.pie-enlaces a:hover {
+  text-decoration: underline;
+}
+
+.cookie-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem);
+  max-width: 660px;
+  background: var(--instrumento);
+  color: var(--instrumento-texto);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(11, 19, 38, 0.35);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  z-index: 90;
+}
+
+.cookie-banner p {
+  margin: 0;
+  flex: 1 1 280px;
+  font-size: 0.92rem;
+}
+
+.cookie-banner a {
+  color: #bae6fd;
+}
+
+.cookie-acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ==========================================================================
+   Pantallas estrechas
+   ========================================================================== */
+@media (max-width: 900px) {
+  .lab-cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .escena-marco,
+  .escena3d {
+    height: 23rem;
+  }
+}
+
+@media (max-width: 560px) {
+  html {
+    font-size: 100%;
+  }
+  .barra-interior,
+  .contenedor {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .barra-nav {
+    gap: 1rem;
+    font-size: 0.92rem;
+  }
+  .intro {
+    padding-top: 1.5rem;
+  }
+  .intro h1 {
+    font-size: 1.85rem;
+  }
+  .lede {
+    font-size: 1.12rem;
+  }
+  .lectura {
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+  }
+  .lectura:first-child {
+    padding-left: 0.8rem;
+  }
+  .lectura dd {
+    font-size: 1.45rem;
+  }
+  .lectura-principal dd {
+    font-size: 1.9rem;
+  }
+  .escena-marco,
+  .escena3d {
+    height: 21rem;
+  }
+  .cookie-banner {
+    bottom: 0;
+    width: 100%;
+    border-radius: 14px 14px 0 0;
+  }
+}

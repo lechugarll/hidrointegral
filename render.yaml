@@ -1,0 +1,12 @@
+# Configuración para Render (https://render.com): "Blueprint" de un solo servicio.
+# Al conectar el repositorio, Render lee este archivo y construye el Dockerfile.
+services:
+  - type: web
+    name: hidrointegral
+    runtime: docker
+    plan: free
+    healthCheckPath: /salud
+    envVars:
+      # Detrás del HTTPS de Render: activa HSTS y la redirección a HTTPS de la API.
+      - key: HIDRO_HTTPS
+        value: "1"

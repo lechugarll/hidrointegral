@@ -1,0 +1,6 @@
+# Solo lo necesario para ejecutar el servidor publicado (sin pruebas ni el generador de GIF).
+# Versiones fijas: son las mismas con las que se probó el proyecto.
+numpy==2.5.4
+sympy==1.14.0
+fastapi==0.148.0
+uvicorn==0.54.0

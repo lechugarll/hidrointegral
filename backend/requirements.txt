@@ -1,0 +1,8 @@
+numpy
+sympy
+fastapi
+uvicorn
+pytest
+httpx
+matplotlib
+pillow
