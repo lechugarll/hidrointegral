@@ -46,7 +46,9 @@ frontend/             # React + Vite
   src/components/Tuberia3D.jsx  # depósito → tubería → depósito; Python da las partículas
   src/escenarios.js   # situaciones reales (llave, bomba, lluvia…) con su explicación
   src/siteConfig.js   # datos del responsable (los muestran las páginas legales)
-PRODUCT.md            # contexto de diseño: público, personalidad, principios
+docs/PRODUCT.md      # contexto de diseño: público, personalidad, principios
+docs/DESPLIEGUE.md   # cómo publicarlo gratis (GitHub + Render)
+docs/LANZAMIENTO.md  # lista de cumplimiento y accesibilidad
 ```
 
 El frontend llama rutas `/api/...` que Vite reenvía a `http://127.0.0.1:8000`
