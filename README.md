@@ -1,109 +1,125 @@
 # HidroIntegral
 
-Acumulación de agua y capacidad de tuberías con integrales (Cálculo II, 2026).
+**¿Cuánta agua hay en un tanque? ¿Cuánta pasa por una tubería?** HidroIntegral responde ambas preguntas con integrales definidas y las muestra como escenas en 3D: un tanque que se llena y una tubería por la que fluye el agua.
 
-- `V = ∫ q(t) dt`: volumen como área bajo la curva del caudal.
-- `Q = ∫ v(r)·2πr dr`: caudal de una tubería a partir del perfil de velocidades.
+![Agua yendo de un depósito a otro por una tubería, animación generada con Python](docs/capturas/tuberia-animada.gif)
 
-## Probarlo en tu computador
+Proyecto final de Cálculo II (2026).
 
-Dos terminales:
+## ¿Qué es?
 
-```
+Cuando una llave se abre poco a poco, el caudal no es constante, y entonces la cuenta «litros = caudal × minutos» ya no sirve. La solución es la **integral**: sumar el agua que entra en cada instante. Geométricamente, es el **área bajo la curva del caudal**.
+
+HidroIntegral hace visible esa idea: mueves el tiempo y ves a la vez cómo cambia la curva, el área sombreada y el nivel del tanque.
+
+## Qué puedes hacer
+
+### Volumen en un tanque
+
+![Tanque 3D y área bajo la curva del caudal](docs/capturas/laboratorio-tanque.png)
+
+- Elegir entre **cinco situaciones reales** (una llave que se abre, un caudal constante, una bomba con ciclos, la lluvia sobre un techo y un depósito que se vacía) y ver **por qué** el caudal tiene esa forma.
+- Escribir **tu propia función** del caudal, por ejemplo `12+8*sin(t)`.
+- Reproducir la animación o **arrastrar sobre la gráfica** para viajar en el tiempo.
+- Cambiar la capacidad del tanque y ver si **se desborda** y cuándo se llena.
+- Comparar con el **caudal promedio** (un rectángulo con la misma área).
+- Ver cómo lo calcula el computador: el valor exacto con el teorema fundamental del cálculo, y las aproximaciones con rectángulos de Riemann, trapecio y Simpson.
+
+### Capacidad de una tubería
+
+![Simulación 3D de una tubería entre dos depósitos](docs/capturas/tuberia-3d.png)
+
+- Cambiar el **diámetro** de la tubería y la **velocidad** del agua.
+- Ver el agua fluir en 3D: las partículas del centro avanzan más rápido que las de la pared.
+- Consultar el caudal, el número de Reynolds y el régimen (laminar o turbulento).
+- Comprobar que sumar los anillos del perfil de velocidades da el mismo caudal que la fórmula simple `Q = A·v`.
+
+## Las ideas matemáticas
+
+| Problema | Integral | Idea |
+|---|---|---|
+| Volumen acumulado | `V = ∫ₐᵇ q(t) dt` | El área bajo la curva del caudal. |
+| Caudal de una tubería | `Q = ∫₀ᴿ v(r)·2πr dr` | Se suma el aporte de cada anillo del tubo. |
+| Valor exacto | `∫ₐᵇ q(t) dt = F(b) − F(a)` | Teorema fundamental del cálculo. |
+
+Con `q(t) = 2t + 3` L/min de 0 a 4 min, el volumen exacto es **28 L**. La suma de Riemann por la izquierda con 4 rectángulos da 24 L, y el trapecio y Simpson dan 28 L.
+
+> Las animaciones son esquemáticas: las velocidades relativas siguen el perfil real de velocidades, pero el tamaño y la rapidez en pantalla están escalados.
+
+## Tecnologías
+
+- **Cálculo:** Python, FastAPI, SymPy (integral exacta) y NumPy (métodos numéricos). Python también calcula las partículas de las animaciones.
+- **Interfaz:** React, Vite, Three.js (escenas 3D) y gráficas propias en SVG.
+- **Empaquetado:** Docker.
+
+La función del caudal que escribe el usuario se valida antes de evaluarse: nunca se ejecuta código arbitrario.
+
+## Ejecutarlo en tu computador
+
+Necesitas [Python 3.12](https://www.python.org/downloads/) y [Node.js](https://nodejs.org/). Abre dos terminales.
+
+**Terminal 1: el servidor de cálculo**
+
+```bash
 cd backend
 pip install -r requirements.txt
 uvicorn hidro.api:app --reload
 ```
 
-```
+**Terminal 2: la página**
+
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Abre http://localhost:5173. La documentación interactiva de la API está en http://127.0.0.1:8000/docs.
-Las pruebas: `cd backend && pytest -q`.
+Abre http://localhost:5173 en el navegador. La documentación interactiva de la API está en http://127.0.0.1:8000/docs.
 
-> El servidor de Python **no recarga solo** cuando no usas `--reload`: si cambias código del backend, reinícialo.
+### Con Docker
 
-## Publicarlo gratis para que lo vean tus compañeros
-
-La web (React) y el cálculo (Python) se empaquetan en **un solo servicio** (`Dockerfile`): un único enlace sirve la página y la API. Los hostings de páginas estáticas (GitHub Pages, Netlify) no ejecutan Python, por eso se usa un servicio que acepte Docker. Aquí se explica **Render**; al final hay una alternativa.
-
-### Antes de publicar (2 minutos)
-
-1. Abre `frontend/src/siteConfig.js` y escribe el nombre del grupo y un correo de contacto. Las páginas de privacidad los muestran; si los dejas vacíos, no se inventa nada.
-2. Decide si el repositorio será público: si quieres, quita la carpeta `informe/` (informe y diapositivas) antes de subirla.
-
-### Paso 1: subir el código a GitHub
-
-1. En https://github.com crea un repositorio vacío (por ejemplo `hidrointegral`), sin README.
-2. En la carpeta del proyecto:
-
-```
-git init
-git add .
-git commit -m "HidroIntegral"
-git branch -M main
-git remote add origin https://github.com/TU_USUARIO/hidrointegral.git
-git push -u origin main
-```
-
-### Paso 2: crear el servicio en Render
-
-1. Entra a https://render.com e inicia sesión con tu cuenta de GitHub.
-2. **New +** → **Blueprint** → elige tu repositorio. Render lee `render.yaml` y propone el servicio `hidrointegral` en el plan **Free**.
-3. **Apply**. La primera construcción tarda varios minutos (compila la web e instala Python).
-4. Cuando termine, Render te da una dirección como `https://hidrointegral-xxxx.onrender.com`. Ese es el enlace para compartir.
-
-### Paso 3: poner tu dirección real (recomendado)
-
-Las etiquetas para compartir en redes y el mapa del sitio usan una dirección de ejemplo. Cámbiala por la tuya:
-
-```
-python scripts/poner_dominio.py https://hidrointegral-xxxx.onrender.com
-git add .
-git commit -m "Dirección real del sitio"
-git push
-```
-
-Render vuelve a publicar solo.
-
-### Lo que debes saber del plan gratuito
-
-- El servicio **se duerme tras 15 minutos sin visitas** y tarda hasta **un minuto en despertar**: la primera persona que lo abra verá una espera. Ábrelo tú unos minutos antes de presentar.
-- Hay un límite mensual de horas gratuitas (750 h por cuenta) y de ancho de banda. Las condiciones cambian; revísalas en https://docs.render.com/free.
-- Si Render te pide una tarjeta, revisa su página de precios antes de continuar: puedes usar la alternativa de abajo.
-
-### Alternativa: Hugging Face Spaces (también gratis)
-
-1. En https://huggingface.co crea un **Space** con SDK **Docker** (hardware «CPU basic», gratis).
-2. Sube el contenido del proyecto a ese Space (con `git push` al repositorio del Space) y añade esto **al principio** del `README.md` de ese repositorio:
-
-```
----
-title: HidroIntegral
-sdk: docker
-app_port: 7860
----
-```
-
-3. El `Dockerfile` ya escucha en el puerto 7860. Su política de reposo no la pude confirmar: consúltala en la documentación de Spaces.
-
-### Probar la imagen en tu computador (opcional, necesita Docker)
-
-```
+```bash
 docker build -t hidrointegral .
 docker run -p 8080:7860 hidrointegral
 ```
 
 Abre http://localhost:8080.
 
-## Archivos importantes
+## Pruebas
 
-- `Dockerfile`, `render.yaml`: cómo se construye y publica.
-- `backend/hidro/servidor.py`: el servidor único (web + `/api`).
-- `LANZAMIENTO.md`: lista de cumplimiento y accesibilidad.
-- `CLAUDE.md`: contexto técnico del proyecto.
+```bash
+cd backend
+pytest -q
+```
 
-Para continuar con Claude Code: abre esta carpeta y corre `claude`. Lee `CLAUDE.md` automáticamente.
+Las pruebas reproducen casos calculados a mano (por ejemplo, los 28 L de arriba y una tubería de 1" a 2 m/s que da 60.8 L/min).
+
+## Estructura del proyecto
+
+```
+backend/
+  hidro/
+    volumen.py       integrales de q(t): exacta, Riemann, trapecio, Simpson
+    tuberia.py       capacidad, número de Reynolds y perfil de velocidades
+    animacion.py     partículas de las animaciones 3D
+    render_gif.py    genera un GIF de la tubería solo con Python
+    api.py           API (FastAPI)
+    servidor.py      servidor único: página + API
+  tests/             pruebas (pytest)
+frontend/
+  src/pages/         las dos páginas principales y las páginas legales
+  src/components/    tanque 3D, tubería 3D, gráficas y lecturas
+docs/                capturas y notas del proyecto
+Dockerfile           construye la página y el servidor en una sola imagen
+```
+
+## Generar el GIF de la tubería
+
+```bash
+cd backend
+python -m hidro.render_gif --diametro 1 --velocidad 2 --salida animacion_tuberia.gif
+```
+
+## Licencia
+
+MIT. Consulta el archivo [LICENSE](LICENSE).

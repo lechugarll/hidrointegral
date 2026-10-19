@@ -65,7 +65,7 @@ Auditoría hecha sobre el código real. **✅ hecho · ➖ no aplica · ⚠️ p
 
 ## Cómo publicarlo
 
-Paso a paso en el [README](README.md#publicarlo-gratis-para-que-lo-vean-tus-compañeros): un solo servicio (`Dockerfile` + `render.yaml`) sirve la web y la API. La dirección real se pone con `python scripts/poner_dominio.py https://tu-direccion`.
+Paso a paso en [DESPLIEGUE.md](DESPLIEGUE.md): un solo servicio (`Dockerfile` + `render.yaml`) sirve la web y la API. La dirección real se pone con `python scripts/poner_dominio.py https://tu-direccion`.
 
 ## Pendiente al desplegar (requiere tu dominio/hosting real)
 
